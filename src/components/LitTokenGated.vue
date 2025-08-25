@@ -37,6 +37,7 @@ const encryptedData = ref<{ ciphertext: string; dataToSign: string } | null>(nul
 const decryptedMessage = ref('');
 const error = ref<string | null>(null);
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let litNodeClient: any;
 
 const accessControlConditions = [
@@ -56,6 +57,7 @@ const accessControlConditions = [
 onMounted(async () => {
   litNodeClient = new LitJsSdk.LitNodeClient({ litNetwork: 'cayenne' });
   await litNodeClient.connect();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (window as any).litNodeClient = litNodeClient;
 });
 
@@ -64,7 +66,7 @@ const encryptMessage = async () => {
   encrypting.value = true;
   error.value = null;
   try {
-    const authSig = await LitJsSdk.checkAndSignAuthMessage({ chain: 'optimismSepolia' });
+    await LitJsSdk.checkAndSignAuthMessage({ chain: 'optimismSepolia' });
     const { ciphertext, dataToSign } = await LitJsSdk.encryptString(
       {
         accessControlConditions,
@@ -74,8 +76,8 @@ const encryptMessage = async () => {
       litNodeClient
     );
     encryptedData.value = { ciphertext, dataToSign };
-  } catch (e: any) {
-    error.value = e.message;
+  } catch (e: unknown) {
+    error.value = (e as Error).message;
   } finally {
     encrypting.value = false;
   }
@@ -86,7 +88,7 @@ const decryptMessage = async () => {
   decrypting.value = true;
   error.value = null;
   try {
-    const authSig = await LitJsSdk.checkAndSignAuthMessage({ chain: 'optimismSepolia' });
+    await LitJsSdk.checkAndSignAuthMessage({ chain: 'optimismSepolia' });
     const decryptedString = await LitJsSdk.decryptToString(
       {
         accessControlConditions,
@@ -97,8 +99,8 @@ const decryptMessage = async () => {
       litNodeClient
     );
     decryptedMessage.value = decryptedString;
-  } catch (e: any) {
-    error.value = e.message;
+  } catch (e: unknown) {
+    error.value = (e as Error).message;
   } finally {
     decrypting.value = false;
   }
