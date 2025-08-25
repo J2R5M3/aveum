@@ -28,7 +28,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import * as LitJsSdk from '@lit-protocol/lit-node-client';
+import * as LitJsSdk from '@lit-protocol/sdk-browser';
 
 const secretMessage = ref('This is a secret message!');
 const encrypting = ref(false);

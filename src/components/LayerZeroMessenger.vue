@@ -1,6 +1,14 @@
 <template>
   <div class="layerzero-messenger">
     <h2>LayerZero Messenger</h2>
+    <div class="warning">
+      <p>
+        <strong>Note:</strong> This component requires you to deploy the `SimpleOApp` smart contract to two testnets and update the `contractAddress` in the script.
+      </p>
+      <p>
+        See the instructions in `contracts/README.md`.
+      </p>
+    </div>
     <div v-if="!isConnected">
       <button @click="connectWallet">Connect Wallet</button>
     </div>
@@ -34,7 +42,7 @@
 import { ref, onMounted } from 'vue';
 import { ethers } from 'ethers';
 
-// TODO: Replace with your deployed contract addresses
+// IMPORTANT: Replace with your deployed contract address
 const contractAddress = 'YOUR_CONTRACT_ADDRESS';
 const contractABI = [
   {
@@ -153,5 +161,12 @@ const fetchMessage = async () => {
   padding: 20px;
   border: 1px solid #ccc;
   border-radius: 5px;
+}
+.warning {
+  background-color: #fff3cd;
+  color: #856404;
+  padding: 15px;
+  border-radius: 5px;
+  margin-bottom: 20px;
 }
 </style>
