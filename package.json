@@ -16,10 +16,12 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
-    "@irys/upload": "^0.0.15",
-    "@irys/upload-ethereum": "^0.0.16",
+    "@irys/sdk": "^0.2.2",
     "@lit-protocol/sdk-browser": "^1.1.250",
     "ethers": "^5.8.0",
+    "jszip": "^3.10.1",
+    "lit-connect-modal": "0.1.11",
+    "lit-siwe": "1.1.8",
     "pinia": "^2.0.0",
     "vue": "^3.5.18",
     "vue-router": "^4.5.1"

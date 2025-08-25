@@ -17,8 +17,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { Uploader } from '@irys/upload';
-import { Ethereum }from '@irys/upload-ethereum';
+import { WebIrys } from '@irys/sdk';
+import { ethers } from 'ethers';
 
 const file = ref<File | null>(null);
 const uploading = ref(false);
@@ -33,13 +33,19 @@ const onFileSelected = (event: Event) => {
 };
 
 const getIrys = async () => {
-  const privateKey = import.meta.env.VITE_PRIVATE_KEY;
-  if (!privateKey) {
-    throw new Error('VITE_PRIVATE_KEY is not set in .env file');
+  if (!window.ethereum) {
+    throw new Error('MetaMask not found');
   }
+  await window.ethereum.request({ method: 'eth_requestAccounts' });
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
 
-  const irysUploader = await Uploader(Ethereum).withWallet(privateKey).devnet();
-  return irysUploader;
+  const network = 'devnet';
+  const token = 'ethereum';
+  const wallet = { name: 'ethersv5', provider: provider };
+
+  const webIrys = new WebIrys({ network, token, wallet });
+  await webIrys.ready();
+  return webIrys;
 };
 
 const uploadFile = async () => {
@@ -55,8 +61,8 @@ const uploadFile = async () => {
     const irys = await getIrys();
     const receipt = await irys.uploadFile(file.value);
     txId.value = receipt.id;
-  } catch (e: any) {
-    error.value = e.message;
+  } catch (e: unknown) {
+    error.value = (e as Error).message;
   } finally {
     uploading.value = false;
   }

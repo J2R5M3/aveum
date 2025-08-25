@@ -87,35 +87,36 @@ const fetching = ref(false);
 const receivedMessage = ref('');
 const error = ref<string | null>(null);
 
-let provider: ethers.BrowserProvider | null = null;
+let provider: ethers.providers.Web3Provider | null = null;
 let signer: ethers.Signer | null = null;
 let contract: ethers.Contract | null = null;
 
 onMounted(async () => {
   if (window.ethereum) {
-    provider = new ethers.BrowserProvider(window.ethereum);
+    provider = new ethers.providers.Web3Provider(window.ethereum);
     const accounts = await provider.listAccounts();
     if (accounts.length > 0) {
       isConnected.value = true;
-      account.value = accounts[0].address;
-      signer = await provider.getSigner();
+      account.value = accounts[0];
+      signer = provider.getSigner();
       contract = new ethers.Contract(contractAddress, contractABI, signer);
     }
   }
 });
 
 const connectWallet = async () => {
-  if (provider) {
+  if (window.ethereum) {
+    provider = new ethers.providers.Web3Provider(window.ethereum);
     try {
       const accounts = await provider.send('eth_requestAccounts', []);
       if (accounts.length > 0) {
         isConnected.value = true;
         account.value = accounts[0];
-        signer = await provider.getSigner();
+        signer = provider.getSigner();
         contract = new ethers.Contract(contractAddress, contractABI, signer);
       }
-    } catch (e: any) {
-      error.value = e.message;
+    } catch (e: unknown) {
+      error.value = (e as Error).message;
     }
   }
 };
@@ -125,7 +126,7 @@ const sendMessage = async () => {
   sending.value = true;
   error.value = null;
   try {
-    const fee = ethers.parseEther('0.01'); // Placeholder fee
+    const fee = ethers.utils.parseEther('0.01'); // Placeholder fee
     const tx = await contract.sendMessage(
       destinationEid.value,
       messageToSend.value,
@@ -133,8 +134,8 @@ const sendMessage = async () => {
     );
     await tx.wait();
     alert('Message sent!');
-  } catch (e: any) {
-    error.value = e.message;
+  } catch (e: unknown) {
+    error.value = (e as Error).message;
   } finally {
     sending.value = false;
   }
@@ -147,8 +148,8 @@ const fetchMessage = async () => {
   try {
     const message = await contract.message();
     receivedMessage.value = message;
-  } catch (e: any) {
-    error.value = e.message;
+  } catch (e: unknown) {
+    error.value = (e as Error).message;
   } finally {
     fetching.value = false;
   }
